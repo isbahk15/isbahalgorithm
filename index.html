@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentence Character Analysis</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Apply Inter font */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f9fb;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 min-h-screen flex items-start justify-center">
+
+    <div class="w-full max-w-2xl bg-white shadow-xl rounded-xl p-6 md:p-10 mt-10">
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">Character-by-Character Sentence Analyzer</h1>
+        <p class="text-gray-600 mb-6">Enter a sentence ending with a period (.), and the script will analyze it using only three counter variables.</p>
+
+        <!-- Input Area -->
+        <div class="mb-6">
+            <textarea id="sentenceInput" rows="4" 
+                      class="w-full p-3 border-2 border-indigo-200 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out resize-none shadow-inner"
+                      placeholder="Type your sentence here. Remember to end it with a period.">Hello world. This is a test sentence.</textarea>
+        </div>
+
+        <!-- Action Button -->
+        <button id="analyzeButton" 
+                class="w-full py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition duration-150 ease-in-out transform hover:scale-[1.01]">
+            Analyze Sentence
+        </button>
+
+        <!-- Results Area -->
+        <div id="resultsArea" class="mt-8 p-5 bg-indigo-50 border-l-4 border-indigo-600 rounded-lg hidden">
+            <h2 class="text-xl font-bold text-indigo-800 mb-3">Analysis Results</h2>
+            <div class="space-y-2">
+                <p id="resultLength" class="text-lg text-gray-700"><span class="font-semibold text-indigo-700">Length (Characters):</span> <span id="valLength"></span></p>
+                <p id="resultWords" class="text-lg text-gray-700"><span class="font-semibold text-indigo-700">Number of Words:</span> <span id="valWords"></span></p>
+                <p id="resultVowels" class="text-lg text-gray-700"><span class="font-semibold text-indigo-700">Number of Vowels:</span> <span id="valVowels"></span></p>
+            </div>
+            <p id="errorMessage" class="text-red-500 mt-4 hidden"></p>
+        </div>
+
+    </div>
+
+    <script>
+        document.getElementById('analyzeButton').addEventListener('click', analyzeSentence);
+
+        function analyzeSentence() {
+            const sentence = document.getElementById('sentenceInput').value.trim();
+            const resultsArea = document.getElementById('resultsArea');
+            const errorMessage = document.getElementById('errorMessage');
+
+            // Reset UI elements
+            resultsArea.classList.add('hidden');
+            errorMessage.classList.add('hidden');
+            
+            if (!sentence.includes('.')) {
+                errorMessage.textContent = "Error: Please ensure your sentence ends with a period (.).";
+                errorMessage.classList.remove('hidden');
+                return;
+            }
+
+            // --- THE CORE ALGORITHM ---
+
+            // The three mandated counters.
+            let charCount = 0;  // 1. Length of the sentence (excluding the final '.')
+            let wordCount = 0;  // 2. Number of words (used to count spaces/separators)
+            let vowelCount = 0; // 3. Number of vowels
+
+            let hasContent = false; // Helper flag to check if any text was processed
+
+            // Process the sentence character by character
+            for (let i = 0; i < sentence.length; i++) {
+                const char = sentence[i];
+                
+                // Stop when the termination point is reached
+                if (char === '.') {
+                    break;
+                }
+
+                // Mark that we found meaningful content
+                hasContent = true;
+
+                // 1. Count the character for sentence length
+                charCount++;
+
+                // 2. Count the word separators (spaces)
+                // We assume words are separated by a single space.
+                if (char === ' ') {
+                    wordCount++;
+                }
+
+                // 3. Count the vowels (case-insensitive)
+                const lowerChar = char.toLowerCase();
+                if ('aeiou'.includes(lowerChar)) {
+                    vowelCount++;
+                }
+            }
+
+            // Final adjustment for word count:
+            // If content exists, the number of words is (number of spaces + 1).
+            // This is done outside the loop to adhere to the instruction to count 
+            // words based on the number of separators.
+            if (hasContent) {
+                wordCount++;
+            }
+
+            // --- END OF CORE ALGORITHM ---
+
+            // Display results
+            document.getElementById('valLength').textContent = charCount;
+            document.getElementById('valWords').textContent = wordCount;
+            document.getElementById('valVowels').textContent = vowelCount;
+            
+            resultsArea.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
